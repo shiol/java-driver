@@ -227,6 +227,13 @@ public class MetadataManager implements AsyncAutoCloseable {
    */
   public CompletionStage<RefreshSchemaResult> refreshSchema(
       String keyspace, boolean evenIfDisabled, boolean flushNow) {
+    LOG.trace(
+        "[{}] MetadataManager refreshSchema keyspace = {}, evenIfDisabled = {}, flushNow = {}, inEventLoop = {}",
+        logPrefix,
+        keyspace,
+        evenIfDisabled,
+        flushNow,
+        adminExecutor.inEventLoop());
     CompletableFuture<RefreshSchemaResult> future = new CompletableFuture<>();
     RunOrSchedule.on(
         adminExecutor,
@@ -368,6 +375,14 @@ public class MetadataManager implements AsyncAutoCloseable {
         boolean flushNow,
         CompletableFuture<RefreshSchemaResult> future) {
 
+      LOG.trace(
+          "[{}] MetadataManager.SingleThreaded refreshSchema keyspace = {}, evenIfDisabled = {}, flushNow = {}, didFirstNodeListRefresh = {}",
+          logPrefix,
+          keyspace,
+          evenIfDisabled,
+          flushNow,
+          didFirstNodeListRefresh);
+
       if (!didFirstNodeListRefresh) {
         // This happen if the control connection receives a schema event during init. We can't
         // refresh yet because we don't know the nodes' versions, simply ignore.
@@ -381,6 +396,9 @@ public class MetadataManager implements AsyncAutoCloseable {
       if (isRefreshedKeyspace && (evenIfDisabled || isSchemaEnabled())) {
         acceptSchemaRequest(future, flushNow);
       } else {
+        LOG.trace(
+            "[{}] MetadataManager.SingleThreaded refreshSchema: completing future immediately",
+            logPrefix);
         future.complete(new RefreshSchemaResult(metadata));
         singleThreaded.firstSchemaRefreshFuture.complete(null);
       }
@@ -393,6 +411,11 @@ public class MetadataManager implements AsyncAutoCloseable {
       if (closeWasCalled) {
         future.complete(new RefreshSchemaResult(metadata));
       } else {
+        LOG.trace(
+            "[{}] MetadataManager.SingleThreaded acceptSchemaRequest enqueuing future = {}, flushNow = {}",
+            logPrefix,
+            future,
+            flushNow);
         schemaRefreshDebouncer.receive(future);
         if (flushNow) {
           schemaRefreshDebouncer.flushNow();
@@ -431,6 +454,11 @@ public class MetadataManager implements AsyncAutoCloseable {
             .thenCompose(v -> context.getTopologyMonitor().checkSchemaAgreement())
             .whenComplete(
                 (schemaInAgreement, agreementError) -> {
+                  LOG.debug(
+                      "[{}] Schema refresh ongoing, schemaInAgreement = {}, agreementError = {}",
+                      logPrefix,
+                      schemaInAgreement,
+                      agreementError);
                   if (agreementError != null) {
                     refreshFuture.completeExceptionally(agreementError);
                   } else {
@@ -440,6 +468,11 @@ public class MetadataManager implements AsyncAutoCloseable {
                         .thenApplyAsync(this::parseAndApplySchemaRows, adminExecutor)
                         .whenComplete(
                             (newMetadata, metadataError) -> {
+                              LOG.debug(
+                                  "[{}] Schema refresh finished, newMetadata = {}, metadataError = {}",
+                                  logPrefix,
+                                  newMetadata,
+                                  metadataError);
                               if (metadataError != null) {
                                 refreshFuture.completeExceptionally(metadataError);
                               } else {
