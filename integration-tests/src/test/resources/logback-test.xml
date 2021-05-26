@@ -27,8 +27,6 @@
   </root>
   <logger name="com.datastax.oss.driver.internal.core.control.ControlConnection" level="TRACE"/>
   <logger name="com.datastax.oss.driver.internal.core.metadata.MetadataManager" level="TRACE"/>
-  <logger name="com.datastax.oss.driver.internal.core.util.concurrent.Debouncer" level="TRACE"/>
-  <logger name="com.datastax.oss.driver.internal.core.metadata.schema.refresh.SchemaRefresh" level="TRACE"/>
   <logger name="org.apache.directory" level="${adsServerLevel:-ERROR}"/>
   <logger name="com.datastax.oss.driver" level="${ossDriverLevel:-ERROR}"/>
   <logger name="com.datastax.dse.driver" level="${dseDriverLevel:-ERROR}"/>

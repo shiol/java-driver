@@ -730,15 +730,11 @@ public class SchemaChangesIT {
   private static void setTrace() {
     ((Logger) LoggerFactory.getLogger(ControlConnection.class)).setLevel(Level.TRACE);
     ((Logger) LoggerFactory.getLogger(MetadataManager.class)).setLevel(Level.TRACE);
-    ((Logger) LoggerFactory.getLogger(Debouncer.class)).setLevel(Level.TRACE);
-    ((Logger) LoggerFactory.getLogger(SchemaRefresh.class)).setLevel(Level.TRACE);
   }
 
   private static void setError() {
     ((Logger) LoggerFactory.getLogger(ControlConnection.class)).setLevel(Level.ERROR);
     ((Logger) LoggerFactory.getLogger(MetadataManager.class)).setLevel(Level.ERROR);
-    ((Logger) LoggerFactory.getLogger(Debouncer.class)).setLevel(Level.ERROR);
-    ((Logger) LoggerFactory.getLogger(SchemaRefresh.class)).setLevel(Level.ERROR);
   }
 
   interface TriConsumer<T, U, V> {
