@@ -35,8 +35,6 @@ import com.datastax.oss.driver.api.testinfra.session.SessionRule;
 import com.datastax.oss.driver.api.testinfra.session.SessionUtils;
 import com.datastax.oss.driver.internal.core.control.ControlConnection;
 import com.datastax.oss.driver.internal.core.metadata.MetadataManager;
-import com.datastax.oss.driver.internal.core.metadata.schema.refresh.SchemaRefresh;
-import com.datastax.oss.driver.internal.core.util.concurrent.Debouncer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.time.Duration;
