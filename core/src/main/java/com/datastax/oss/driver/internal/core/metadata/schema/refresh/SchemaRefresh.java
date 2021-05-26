@@ -33,9 +33,12 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import net.jcip.annotations.ThreadSafe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ThreadSafe
 public class SchemaRefresh implements MetadataRefresh {
+  private static final Logger LOG = LoggerFactory.getLogger(SchemaRefresh.class);
 
   @VisibleForTesting public final Map<CqlIdentifier, KeyspaceMetadata> newKeyspaces;
 
@@ -54,6 +57,18 @@ public class SchemaRefresh implements MetadataRefresh {
     }
     for (Map.Entry<CqlIdentifier, KeyspaceMetadata> entry : newKeyspaces.entrySet()) {
       CqlIdentifier key = entry.getKey();
+
+      LOG.debug(
+          "[{}] oldKeyspace.getFunctions() = {}, newKeyspace.getFunctions() = {} ",
+          context.getSessionName(),
+          oldKeyspaces.get(key).getFunctions(),
+          entry.getValue().getFunctions());
+      LOG.debug(
+          "[{}] oldKeyspace.getAggregates() = {}, newKeyspace.getAggregates() = {} ",
+          context.getSessionName(),
+          oldKeyspaces.get(key).getAggregates(),
+          entry.getValue().getAggregates());
+
       computeEvents(oldKeyspaces.get(key), entry.getValue(), events);
     }
 
