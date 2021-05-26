@@ -342,7 +342,7 @@ public class SchemaChangesIT {
   @Test
   @CassandraRequirement(min = "2.2")
   public void should_handle_function_update() {
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1000; i++) {
 
       System.out.println();
       System.out.println();
@@ -420,7 +420,7 @@ public class SchemaChangesIT {
   @Test
   @CassandraRequirement(min = "2.2")
   public void should_handle_aggregate_update() {
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1000; i++) {
 
       System.out.println();
       System.out.println();
@@ -667,9 +667,6 @@ public class SchemaChangesIT {
       //                assertThat(element).isEmpty();
       //              });
 
-      System.out.println("*** EXECUTING CREATE ***");
-      System.out.println();
-
       session1.execute(recreateStatement);
 
       //      await()
@@ -683,9 +680,6 @@ public class SchemaChangesIT {
       //              });
 
       // will trigger an immediate schema refresh bypassing the debouncer
-      System.out.println("*** ENABLING METADATA ***");
-      System.out.println();
-
       session1.setSchemaMetadataEnabled(true);
       session2.setSchemaMetadataEnabled(true);
 
