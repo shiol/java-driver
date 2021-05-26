@@ -20,8 +20,6 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DefaultDriverOption;
@@ -33,8 +31,6 @@ import com.datastax.oss.driver.api.testinfra.CassandraRequirement;
 import com.datastax.oss.driver.api.testinfra.ccm.CustomCcmRule;
 import com.datastax.oss.driver.api.testinfra.session.SessionRule;
 import com.datastax.oss.driver.api.testinfra.session.SessionUtils;
-import com.datastax.oss.driver.internal.core.control.ControlConnection;
-import com.datastax.oss.driver.internal.core.metadata.MetadataManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.time.Duration;
@@ -49,7 +45,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
-import org.slf4j.LoggerFactory;
 
 // @Category(ParallelizableTests.class)
 @SuppressWarnings({"CatchAndPrintStackTrace", "unused"})
@@ -659,8 +654,6 @@ public class SchemaChangesIT {
       assertThat(session1.setSchemaMetadataEnabled(false)).isDone().isCompleted();
       assertThat(session2.setSchemaMetadataEnabled(false)).isDone().isCompleted();
 
-      setTrace();
-
       System.out.println("*** EXECUTING DROP ***");
       System.out.println();
 
@@ -719,20 +712,7 @@ public class SchemaChangesIT {
                 verifyNewMetadata.accept(newElement);
                 verifyListener.accept(listener2, oldElement, newElement);
               });
-
-    } finally {
-      setError();
     }
-  }
-
-  private static void setTrace() {
-    ((Logger) LoggerFactory.getLogger(ControlConnection.class)).setLevel(Level.TRACE);
-    ((Logger) LoggerFactory.getLogger(MetadataManager.class)).setLevel(Level.TRACE);
-  }
-
-  private static void setError() {
-    ((Logger) LoggerFactory.getLogger(ControlConnection.class)).setLevel(Level.ERROR);
-    ((Logger) LoggerFactory.getLogger(MetadataManager.class)).setLevel(Level.ERROR);
   }
 
   interface TriConsumer<T, U, V> {
