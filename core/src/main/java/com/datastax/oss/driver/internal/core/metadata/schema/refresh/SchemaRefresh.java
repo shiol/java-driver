@@ -58,16 +58,18 @@ public class SchemaRefresh implements MetadataRefresh {
     for (Map.Entry<CqlIdentifier, KeyspaceMetadata> entry : newKeyspaces.entrySet()) {
       CqlIdentifier key = entry.getKey();
 
-      LOG.debug(
-          "[{}] oldKeyspace.getFunctions() = {}, newKeyspace.getFunctions() = {} ",
-          context.getSessionName(),
-          oldKeyspaces.get(key).getFunctions(),
-          entry.getValue().getFunctions());
-      LOG.debug(
-          "[{}] oldKeyspace.getAggregates() = {}, newKeyspace.getAggregates() = {} ",
-          context.getSessionName(),
-          oldKeyspaces.get(key).getAggregates(),
-          entry.getValue().getAggregates());
+      if (oldKeyspaces.get(key) != null && entry.getValue() != null) {
+        LOG.debug(
+            "[{}] oldKeyspace.getFunctions() = {}, newKeyspace.getFunctions() = {} ",
+            context.getSessionName(),
+            oldKeyspaces.get(key).getFunctions().keySet(),
+            entry.getValue().getFunctions().keySet());
+        LOG.debug(
+            "[{}] oldKeyspace.getAggregates() = {}, newKeyspace.getAggregates() = {} ",
+            context.getSessionName(),
+            oldKeyspaces.get(key).getAggregates().keySet(),
+            entry.getValue().getAggregates().keySet());
+      }
 
       computeEvents(oldKeyspaces.get(key), entry.getValue(), events);
     }
