@@ -419,6 +419,7 @@ public class SchemaChangesIT {
 
   @Test
   @CassandraRequirement(min = "2.2")
+  @SuppressWarnings("CatchAndPrintStackTrace")
   public void should_handle_aggregate_update() {
     for (int i = 0; i < 1000; i++) {
 
