@@ -431,22 +431,26 @@ public class SchemaChangesIT {
       System.out.println();
 
       CqlIdentifier id = CqlIdentifier.fromInternal("sum" + i);
-      should_handle_update_via_drop_and_recreate(
-          ImmutableList.of(
-              "CREATE FUNCTION plus"
-                  + i
-                  + "(i int, j int) RETURNS NULL ON NULL INPUT RETURNS int "
-                  + "LANGUAGE java AS 'return i+j;'",
-              "CREATE AGGREGATE sum" + i + "(int) SFUNC plus" + i + " STYPE int INITCOND 0"),
-          "DROP AGGREGATE sum" + i,
-          "CREATE AGGREGATE sum" + i + "(int) SFUNC plus" + i + " STYPE int INITCOND 1",
-          metadata ->
-              metadata
-                  .getKeyspace(adminSessionRule.keyspace())
-                  .flatMap(ks -> ks.getAggregate(id, DataTypes.INT)),
-          newAggregate -> assertThat(newAggregate.getInitCond()).hasValue(1),
-          (listener, oldAggregate, newAggregate) ->
-              verify(listener).onAggregateUpdated(newAggregate, oldAggregate));
+      try {
+        should_handle_update_via_drop_and_recreate(
+            ImmutableList.of(
+                "CREATE FUNCTION plus"
+                    + i
+                    + "(i int, j int) RETURNS NULL ON NULL INPUT RETURNS int "
+                    + "LANGUAGE java AS 'return i+j;'",
+                "CREATE AGGREGATE sum" + i + "(int) SFUNC plus" + i + " STYPE int INITCOND 0"),
+            "DROP AGGREGATE sum" + i,
+            "CREATE AGGREGATE sum" + i + "(int) SFUNC plus" + i + " STYPE int INITCOND 1",
+            metadata ->
+                metadata
+                    .getKeyspace(adminSessionRule.keyspace())
+                    .flatMap(ks -> ks.getAggregate(id, DataTypes.INT)),
+            newAggregate -> assertThat(newAggregate.getInitCond()).hasValue(1),
+            (listener, oldAggregate, newAggregate) ->
+                verify(listener).onAggregateUpdated(newAggregate, oldAggregate));
+      } catch (Throwable e) {
+        e.printStackTrace();
+      }
     }
   }
 
