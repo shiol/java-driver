@@ -33,9 +33,13 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import net.jcip.annotations.ThreadSafe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ThreadSafe
 public class SchemaRefresh implements MetadataRefresh {
+
+  private static final Logger LOG = LoggerFactory.getLogger(SchemaRefresh.class);
 
   @VisibleForTesting public final Map<CqlIdentifier, KeyspaceMetadata> newKeyspaces;
 
@@ -108,14 +112,14 @@ public class SchemaRefresh implements MetadataRefresh {
         TypeChangeEvent::created,
         TypeChangeEvent::updated,
         events);
-    computeChildEvents(
+    computeChildEventsLogged(
         oldKeyspace.getFunctions(),
         newKeyspace.getFunctions(),
         FunctionChangeEvent::dropped,
         FunctionChangeEvent::created,
         FunctionChangeEvent::updated,
         events);
-    computeChildEvents(
+    computeChildEventsLogged(
         oldKeyspace.getAggregates(),
         newKeyspace.getAggregates(),
         AggregateChangeEvent::dropped,
@@ -142,6 +146,32 @@ public class SchemaRefresh implements MetadataRefresh {
         events.add(newCreatedEvent.apply(newChild));
       } else if (!oldChild.equals(newChild)) {
         events.add(newUpdatedEvent.apply(oldChild, newChild));
+      }
+    }
+  }
+
+  private <K, V> void computeChildEventsLogged(
+      Map<K, V> oldChildren,
+      Map<K, V> newChildren,
+      Function<V, Object> newDroppedEvent,
+      Function<V, Object> newCreatedEvent,
+      BiFunction<V, V, Object> newUpdatedEvent,
+      ImmutableList.Builder<Object> events) {
+    for (K removedKey : Sets.difference(oldChildren.keySet(), newChildren.keySet())) {
+      V dropped = oldChildren.get(removedKey);
+      LOG.trace("dropped: {}", dropped);
+      events.add(newDroppedEvent.apply(dropped));
+    }
+    for (Map.Entry<K, V> entry : newChildren.entrySet()) {
+      K key = entry.getKey();
+      V newChild = entry.getValue();
+      V oldChild = oldChildren.get(key);
+      if (oldChild == null) {
+        events.add(newCreatedEvent.apply(newChild));
+        LOG.trace("created: {}", newChild);
+      } else if (!oldChild.equals(newChild)) {
+        events.add(newUpdatedEvent.apply(oldChild, newChild));
+        LOG.trace("updated: {} to {}", oldChild, newChild);
       }
     }
   }

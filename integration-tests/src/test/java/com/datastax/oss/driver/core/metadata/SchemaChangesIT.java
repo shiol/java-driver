@@ -39,6 +39,8 @@ import com.datastax.oss.driver.api.testinfra.session.SessionUtils;
 import com.datastax.oss.driver.categories.ParallelizableTests;
 import com.datastax.oss.driver.internal.core.control.ControlConnection;
 import com.datastax.oss.driver.internal.core.metadata.MetadataManager;
+import com.datastax.oss.driver.internal.core.metadata.schema.refresh.SchemaRefresh;
+import com.datastax.oss.driver.internal.core.util.concurrent.Debouncer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.time.Duration;
@@ -373,6 +375,16 @@ public class SchemaChangesIT {
     mmLogger.setAdditive(false);
     mmLogger.addAppender(appender);
 
+    Logger srLogger = (Logger) LoggerFactory.getLogger(SchemaRefresh.class);
+    srLogger.setLevel(Level.TRACE);
+    srLogger.setAdditive(false);
+    srLogger.addAppender(appender);
+
+    Logger dbLogger = (Logger) LoggerFactory.getLogger(Debouncer.class);
+    dbLogger.setLevel(Level.TRACE);
+    dbLogger.setAdditive(false);
+    dbLogger.addAppender(appender);
+
     appender.start();
 
     for (int i = 0; i < 1000; i++) {
@@ -407,6 +419,7 @@ public class SchemaChangesIT {
             (listener, oldFunction, newFunction) ->
                 verify(listener).onFunctionUpdated(newFunction, oldFunction));
       } catch (Throwable e) {
+        System.out.println(e.getMessage());
         e.printStackTrace();
         events.forEach(event -> System.out.println(event));
       } finally {
@@ -416,6 +429,8 @@ public class SchemaChangesIT {
 
     mmLogger.detachAndStopAllAppenders();
     ccLogger.detachAndStopAllAppenders();
+    srLogger.detachAndStopAllAppenders();
+    dbLogger.detachAndStopAllAppenders();
   }
 
   //  @Test
@@ -488,6 +503,16 @@ public class SchemaChangesIT {
     mmLogger.setAdditive(false);
     mmLogger.addAppender(appender);
 
+    Logger srLogger = (Logger) LoggerFactory.getLogger(SchemaRefresh.class);
+    srLogger.setLevel(Level.TRACE);
+    srLogger.setAdditive(false);
+    srLogger.addAppender(appender);
+
+    Logger dbLogger = (Logger) LoggerFactory.getLogger(Debouncer.class);
+    dbLogger.setLevel(Level.TRACE);
+    dbLogger.setAdditive(false);
+    dbLogger.addAppender(appender);
+
     appender.start();
 
     for (int i = 0; i < 1000; i++) {
@@ -519,6 +544,7 @@ public class SchemaChangesIT {
             (listener, oldAggregate, newAggregate) ->
                 verify(listener).onAggregateUpdated(newAggregate, oldAggregate));
       } catch (Throwable e) {
+        System.out.println(e.getMessage());
         e.printStackTrace();
         events.forEach(event -> System.out.println(event));
       }
@@ -526,6 +552,8 @@ public class SchemaChangesIT {
 
     mmLogger.detachAndStopAllAppenders();
     ccLogger.detachAndStopAllAppenders();
+    srLogger.detachAndStopAllAppenders();
+    dbLogger.detachAndStopAllAppenders();
   }
 
   private <T> void should_handle_creation(

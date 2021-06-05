@@ -377,11 +377,12 @@ public class MetadataManager implements AsyncAutoCloseable {
         CompletableFuture<RefreshSchemaResult> future) {
 
       LOG.trace(
-          "[{}] MetadataManager.SingleThreaded refreshSchema keyspace = {}, evenIfDisabled = {}, flushNow = {}, didFirstNodeListRefresh = {}",
+          "[{}] MetadataManager.SingleThreaded refreshSchema keyspace = {}, evenIfDisabled = {}, flushNow = {}, future = {}, didFirstNodeListRefresh = {}",
           logPrefix,
           keyspace,
           evenIfDisabled,
           flushNow,
+          future,
           didFirstNodeListRefresh);
 
       if (!didFirstNodeListRefresh) {
@@ -398,7 +399,7 @@ public class MetadataManager implements AsyncAutoCloseable {
         acceptSchemaRequest(future, flushNow);
       } else {
         LOG.trace(
-            "[{}] MetadataManager.SingleThreaded refreshSchema: completing future immediately",
+            "[{}] MetadataManager.SingleThreaded refreshSchema: schema refresh not needed",
             logPrefix);
         future.complete(new RefreshSchemaResult(metadata));
         singleThreaded.firstSchemaRefreshFuture.complete(null);
