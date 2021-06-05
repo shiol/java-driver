@@ -99,7 +99,8 @@ public class Debouncer<IncomingT, CoalescedT> {
       currentBatch.add(element);
       if (currentBatch.size() == maxEvents) {
         LOG.debug(
-            "[{}] Received {}, flushing immediately (because {} accumulated events)",logPrefix,
+            "[{}] Received {}, flushing immediately (because {} accumulated events)",
+            logPrefix,
             element,
             maxEvents);
         flushNow();
