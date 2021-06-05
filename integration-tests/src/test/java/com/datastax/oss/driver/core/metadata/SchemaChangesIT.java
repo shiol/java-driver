@@ -16,6 +16,7 @@
 package com.datastax.oss.driver.core.metadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -356,6 +357,7 @@ public class SchemaChangesIT {
   @CassandraRequirement(min = "2.2")
   public void should_handle_function_update() {
 
+    boolean error = false;
     for (int i = 0; i < 1000; i++) {
 
       List<ILoggingEvent> events = new CopyOnWriteArrayList<>();
@@ -418,6 +420,7 @@ public class SchemaChangesIT {
             (listener, oldFunction, newFunction) ->
                 verify(listener).onFunctionUpdated(newFunction, oldFunction));
       } catch (Throwable e) {
+        error = true;
         System.out.println(e.getMessage());
         e.printStackTrace();
         events.forEach(event -> System.out.println(event));
@@ -428,6 +431,9 @@ public class SchemaChangesIT {
       ccLogger.detachAndStopAllAppenders();
       srLogger.detachAndStopAllAppenders();
       //      dbLogger.detachAndStopAllAppenders();
+    }
+    if (error) {
+      fail("Some tests failed");
     }
   }
 
@@ -483,6 +489,7 @@ public class SchemaChangesIT {
   @SuppressWarnings("CatchAndPrintStackTrace")
   public void should_handle_aggregate_update() {
 
+    boolean error = false;
     for (int i = 0; i < 1000; i++) {
 
       List<ILoggingEvent> events = new CopyOnWriteArrayList<>();
@@ -542,6 +549,7 @@ public class SchemaChangesIT {
             (listener, oldAggregate, newAggregate) ->
                 verify(listener).onAggregateUpdated(newAggregate, oldAggregate));
       } catch (Throwable e) {
+        error = true;
         System.out.println(e.getMessage());
         e.printStackTrace();
         events.forEach(event -> System.out.println(event));
@@ -552,6 +560,9 @@ public class SchemaChangesIT {
       ccLogger.detachAndStopAllAppenders();
       srLogger.detachAndStopAllAppenders();
       //      dbLogger.detachAndStopAllAppenders();
+    }
+    if (error) {
+      fail("Some tests failed");
     }
   }
 
