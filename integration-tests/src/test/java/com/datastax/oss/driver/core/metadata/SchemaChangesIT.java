@@ -40,7 +40,6 @@ import com.datastax.oss.driver.categories.ParallelizableTests;
 import com.datastax.oss.driver.internal.core.control.ControlConnection;
 import com.datastax.oss.driver.internal.core.metadata.MetadataManager;
 import com.datastax.oss.driver.internal.core.metadata.schema.refresh.SchemaRefresh;
-import com.datastax.oss.driver.internal.core.util.concurrent.Debouncer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.time.Duration;
@@ -357,37 +356,37 @@ public class SchemaChangesIT {
   @CassandraRequirement(min = "2.2")
   public void should_handle_function_update() {
 
-    List<ILoggingEvent> events = new CopyOnWriteArrayList<>();
-    Appender appender =
-        new AppenderBase() {
-          @Override
-          protected void append(Object eventObject) {
-            events.add((ILoggingEvent) eventObject);
-          }
-        };
-    Logger ccLogger = (Logger) LoggerFactory.getLogger(ControlConnection.class);
-    ccLogger.setLevel(Level.TRACE);
-    ccLogger.setAdditive(false);
-    ccLogger.addAppender(appender);
-
-    Logger mmLogger = (Logger) LoggerFactory.getLogger(MetadataManager.class);
-    mmLogger.setLevel(Level.TRACE);
-    mmLogger.setAdditive(false);
-    mmLogger.addAppender(appender);
-
-    Logger srLogger = (Logger) LoggerFactory.getLogger(SchemaRefresh.class);
-    srLogger.setLevel(Level.TRACE);
-    srLogger.setAdditive(false);
-    srLogger.addAppender(appender);
-
-    Logger dbLogger = (Logger) LoggerFactory.getLogger(Debouncer.class);
-    dbLogger.setLevel(Level.TRACE);
-    dbLogger.setAdditive(false);
-    dbLogger.addAppender(appender);
-
-    appender.start();
-
     for (int i = 0; i < 1000; i++) {
+
+      List<ILoggingEvent> events = new CopyOnWriteArrayList<>();
+      Appender appender =
+          new AppenderBase() {
+            @Override
+            protected void append(Object eventObject) {
+              events.add((ILoggingEvent) eventObject);
+            }
+          };
+      Logger ccLogger = (Logger) LoggerFactory.getLogger(ControlConnection.class);
+      ccLogger.setLevel(Level.TRACE);
+      ccLogger.setAdditive(false);
+      ccLogger.addAppender(appender);
+
+      Logger mmLogger = (Logger) LoggerFactory.getLogger(MetadataManager.class);
+      mmLogger.setLevel(Level.TRACE);
+      mmLogger.setAdditive(false);
+      mmLogger.addAppender(appender);
+
+      Logger srLogger = (Logger) LoggerFactory.getLogger(SchemaRefresh.class);
+      srLogger.setLevel(Level.TRACE);
+      srLogger.setAdditive(false);
+      srLogger.addAppender(appender);
+
+      //      Logger dbLogger = (Logger) LoggerFactory.getLogger(Debouncer.class);
+      //      dbLogger.setLevel(Level.TRACE);
+      //      dbLogger.setAdditive(false);
+      //      dbLogger.addAppender(appender);
+
+      appender.start();
 
       System.out.println();
       System.out.println();
@@ -425,12 +424,11 @@ public class SchemaChangesIT {
       } finally {
         events.clear();
       }
+      mmLogger.detachAndStopAllAppenders();
+      ccLogger.detachAndStopAllAppenders();
+      srLogger.detachAndStopAllAppenders();
+      //      dbLogger.detachAndStopAllAppenders();
     }
-
-    mmLogger.detachAndStopAllAppenders();
-    ccLogger.detachAndStopAllAppenders();
-    srLogger.detachAndStopAllAppenders();
-    dbLogger.detachAndStopAllAppenders();
   }
 
   //  @Test
@@ -485,37 +483,37 @@ public class SchemaChangesIT {
   @SuppressWarnings("CatchAndPrintStackTrace")
   public void should_handle_aggregate_update() {
 
-    List<ILoggingEvent> events = new CopyOnWriteArrayList<>();
-    Appender appender =
-        new AppenderBase() {
-          @Override
-          protected void append(Object eventObject) {
-            events.add((ILoggingEvent) eventObject);
-          }
-        };
-    Logger ccLogger = (Logger) LoggerFactory.getLogger(ControlConnection.class);
-    ccLogger.setLevel(Level.TRACE);
-    ccLogger.setAdditive(false);
-    ccLogger.addAppender(appender);
-
-    Logger mmLogger = (Logger) LoggerFactory.getLogger(MetadataManager.class);
-    mmLogger.setLevel(Level.TRACE);
-    mmLogger.setAdditive(false);
-    mmLogger.addAppender(appender);
-
-    Logger srLogger = (Logger) LoggerFactory.getLogger(SchemaRefresh.class);
-    srLogger.setLevel(Level.TRACE);
-    srLogger.setAdditive(false);
-    srLogger.addAppender(appender);
-
-    Logger dbLogger = (Logger) LoggerFactory.getLogger(Debouncer.class);
-    dbLogger.setLevel(Level.TRACE);
-    dbLogger.setAdditive(false);
-    dbLogger.addAppender(appender);
-
-    appender.start();
-
     for (int i = 0; i < 1000; i++) {
+
+      List<ILoggingEvent> events = new CopyOnWriteArrayList<>();
+      Appender appender =
+          new AppenderBase() {
+            @Override
+            protected void append(Object eventObject) {
+              events.add((ILoggingEvent) eventObject);
+            }
+          };
+      Logger ccLogger = (Logger) LoggerFactory.getLogger(ControlConnection.class);
+      ccLogger.setLevel(Level.TRACE);
+      ccLogger.setAdditive(false);
+      ccLogger.addAppender(appender);
+
+      Logger mmLogger = (Logger) LoggerFactory.getLogger(MetadataManager.class);
+      mmLogger.setLevel(Level.TRACE);
+      mmLogger.setAdditive(false);
+      mmLogger.addAppender(appender);
+
+      Logger srLogger = (Logger) LoggerFactory.getLogger(SchemaRefresh.class);
+      srLogger.setLevel(Level.TRACE);
+      srLogger.setAdditive(false);
+      srLogger.addAppender(appender);
+
+      //      Logger dbLogger = (Logger) LoggerFactory.getLogger(Debouncer.class);
+      //      dbLogger.setLevel(Level.TRACE);
+      //      dbLogger.setAdditive(false);
+      //      dbLogger.addAppender(appender);
+
+      appender.start();
 
       System.out.println();
       System.out.println();
@@ -547,13 +545,14 @@ public class SchemaChangesIT {
         System.out.println(e.getMessage());
         e.printStackTrace();
         events.forEach(event -> System.out.println(event));
+      } finally {
+        events.clear();
       }
+      mmLogger.detachAndStopAllAppenders();
+      ccLogger.detachAndStopAllAppenders();
+      srLogger.detachAndStopAllAppenders();
+      //      dbLogger.detachAndStopAllAppenders();
     }
-
-    mmLogger.detachAndStopAllAppenders();
-    ccLogger.detachAndStopAllAppenders();
-    srLogger.detachAndStopAllAppenders();
-    dbLogger.detachAndStopAllAppenders();
   }
 
   private <T> void should_handle_creation(
