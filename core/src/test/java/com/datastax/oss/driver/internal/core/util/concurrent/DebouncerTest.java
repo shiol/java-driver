@@ -70,7 +70,7 @@ public class DebouncerTest {
   public void should_flush_synchronously_if_window_is_zero() {
     Debouncer<Integer, String> debouncer =
         new Debouncer<>(
-            adminExecutor, this::coalesce, this::flush, Duration.ZERO, DEFAULT_MAX_EVENTS);
+            "test", adminExecutor, this::coalesce, this::flush, Duration.ZERO, DEFAULT_MAX_EVENTS);
 
     debouncer.receive(1);
     debouncer.receive(2);
@@ -83,7 +83,7 @@ public class DebouncerTest {
   @Test
   public void should_flush_synchronously_if_max_events_is_one() {
     Debouncer<Integer, String> debouncer =
-        new Debouncer<>(adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, 1);
+        new Debouncer<>("test", adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, 1);
 
     debouncer.receive(1);
     debouncer.receive(2);
@@ -97,7 +97,7 @@ public class DebouncerTest {
   public void should_debounce_after_time_window_if_no_other_event() {
     Debouncer<Integer, String> debouncer =
         new Debouncer<>(
-            adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, DEFAULT_MAX_EVENTS);
+            "test", adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, DEFAULT_MAX_EVENTS);
     debouncer.receive(1);
 
     // a task should have been scheduled, run it
@@ -114,7 +114,7 @@ public class DebouncerTest {
   public void should_reset_time_window_when_new_event() {
     Debouncer<Integer, String> debouncer =
         new Debouncer<>(
-            adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, DEFAULT_MAX_EVENTS);
+            "test", adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, DEFAULT_MAX_EVENTS);
     debouncer.receive(1);
     debouncer.receive(2);
 
@@ -141,7 +141,7 @@ public class DebouncerTest {
   public void should_force_flush_after_max_events() {
     Debouncer<Integer, String> debouncer =
         new Debouncer<>(
-            adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, DEFAULT_MAX_EVENTS);
+            "test", adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, DEFAULT_MAX_EVENTS);
     for (int i = 0; i < 10; i++) {
       debouncer.receive(i);
     }
@@ -155,7 +155,7 @@ public class DebouncerTest {
   public void should_cancel_next_flush_when_stopped() {
     Debouncer<Integer, String> debouncer =
         new Debouncer<>(
-            adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, DEFAULT_MAX_EVENTS);
+            "test", adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, DEFAULT_MAX_EVENTS);
 
     debouncer.receive(1);
     verify(adminExecutor)
@@ -169,7 +169,7 @@ public class DebouncerTest {
   public void should_ignore_new_events_when_flushed() {
     Debouncer<Integer, String> debouncer =
         new Debouncer<>(
-            adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, DEFAULT_MAX_EVENTS);
+            "test", adminExecutor, this::coalesce, this::flush, DEFAULT_WINDOW, DEFAULT_MAX_EVENTS);
     debouncer.stop();
 
     debouncer.receive(1);
