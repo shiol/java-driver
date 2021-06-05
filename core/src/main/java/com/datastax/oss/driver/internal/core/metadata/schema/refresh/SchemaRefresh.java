@@ -112,6 +112,7 @@ public class SchemaRefresh implements MetadataRefresh {
         TypeChangeEvent::created,
         TypeChangeEvent::updated,
         events);
+    LOG.trace("computing functions");
     computeChildEventsLogged(
         oldKeyspace.getFunctions(),
         newKeyspace.getFunctions(),
@@ -119,6 +120,7 @@ public class SchemaRefresh implements MetadataRefresh {
         FunctionChangeEvent::created,
         FunctionChangeEvent::updated,
         events);
+    LOG.trace("computing aggregates");
     computeChildEventsLogged(
         oldKeyspace.getAggregates(),
         newKeyspace.getAggregates(),

@@ -38,8 +38,6 @@ import com.datastax.oss.driver.api.testinfra.ccm.CcmRule;
 import com.datastax.oss.driver.api.testinfra.session.SessionRule;
 import com.datastax.oss.driver.api.testinfra.session.SessionUtils;
 import com.datastax.oss.driver.categories.ParallelizableTests;
-import com.datastax.oss.driver.internal.core.control.ControlConnection;
-import com.datastax.oss.driver.internal.core.metadata.MetadataManager;
 import com.datastax.oss.driver.internal.core.metadata.schema.refresh.SchemaRefresh;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -368,15 +366,15 @@ public class SchemaChangesIT {
               events.add((ILoggingEvent) eventObject);
             }
           };
-      Logger ccLogger = (Logger) LoggerFactory.getLogger(ControlConnection.class);
-      ccLogger.setLevel(Level.TRACE);
-      ccLogger.setAdditive(false);
-      ccLogger.addAppender(appender);
-
-      Logger mmLogger = (Logger) LoggerFactory.getLogger(MetadataManager.class);
-      mmLogger.setLevel(Level.TRACE);
-      mmLogger.setAdditive(false);
-      mmLogger.addAppender(appender);
+      //      Logger ccLogger = (Logger) LoggerFactory.getLogger(ControlConnection.class);
+      //      ccLogger.setLevel(Level.TRACE);
+      //      ccLogger.setAdditive(false);
+      //      ccLogger.addAppender(appender);
+      //
+      //      Logger mmLogger = (Logger) LoggerFactory.getLogger(MetadataManager.class);
+      //      mmLogger.setLevel(Level.TRACE);
+      //      mmLogger.setAdditive(false);
+      //      mmLogger.addAppender(appender);
 
       Logger srLogger = (Logger) LoggerFactory.getLogger(SchemaRefresh.class);
       srLogger.setLevel(Level.TRACE);
@@ -427,8 +425,8 @@ public class SchemaChangesIT {
       } finally {
         events.clear();
       }
-      mmLogger.detachAndStopAllAppenders();
-      ccLogger.detachAndStopAllAppenders();
+      //      mmLogger.detachAndStopAllAppenders();
+      //      ccLogger.detachAndStopAllAppenders();
       srLogger.detachAndStopAllAppenders();
       //      dbLogger.detachAndStopAllAppenders();
     }
@@ -500,15 +498,15 @@ public class SchemaChangesIT {
               events.add((ILoggingEvent) eventObject);
             }
           };
-      Logger ccLogger = (Logger) LoggerFactory.getLogger(ControlConnection.class);
-      ccLogger.setLevel(Level.TRACE);
-      ccLogger.setAdditive(false);
-      ccLogger.addAppender(appender);
-
-      Logger mmLogger = (Logger) LoggerFactory.getLogger(MetadataManager.class);
-      mmLogger.setLevel(Level.TRACE);
-      mmLogger.setAdditive(false);
-      mmLogger.addAppender(appender);
+      //      Logger ccLogger = (Logger) LoggerFactory.getLogger(ControlConnection.class);
+      //      ccLogger.setLevel(Level.TRACE);
+      //      ccLogger.setAdditive(false);
+      //      ccLogger.addAppender(appender);
+      //
+      //      Logger mmLogger = (Logger) LoggerFactory.getLogger(MetadataManager.class);
+      //      mmLogger.setLevel(Level.TRACE);
+      //      mmLogger.setAdditive(false);
+      //      mmLogger.addAppender(appender);
 
       Logger srLogger = (Logger) LoggerFactory.getLogger(SchemaRefresh.class);
       srLogger.setLevel(Level.TRACE);
@@ -556,8 +554,8 @@ public class SchemaChangesIT {
       } finally {
         events.clear();
       }
-      mmLogger.detachAndStopAllAppenders();
-      ccLogger.detachAndStopAllAppenders();
+      //      mmLogger.detachAndStopAllAppenders();
+      //      ccLogger.detachAndStopAllAppenders();
       srLogger.detachAndStopAllAppenders();
       //      dbLogger.detachAndStopAllAppenders();
     }
@@ -768,7 +766,7 @@ public class SchemaChangesIT {
       assertThat(session1.setSchemaMetadataEnabled(false)).isDone().isCompleted();
       assertThat(session2.setSchemaMetadataEnabled(false)).isDone().isCompleted();
 
-      LoggerFactory.getLogger(MetadataManager.class).error("*** EXECUTING DROP ***");
+      LoggerFactory.getLogger(SchemaChangesIT.class).error("*** EXECUTING DROP ***");
 
       session1.execute(dropStatement);
 
@@ -782,7 +780,7 @@ public class SchemaChangesIT {
       //                assertThat(element).isEmpty();
       //              });
 
-      LoggerFactory.getLogger(MetadataManager.class).error("*** EXECUTING RECREATE ***");
+      LoggerFactory.getLogger(SchemaChangesIT.class).error("*** EXECUTING RECREATE ***");
 
       session1.execute(recreateStatement);
 
@@ -797,7 +795,7 @@ public class SchemaChangesIT {
       //              });
 
       // will trigger an immediate schema refresh bypassing the debouncer
-      LoggerFactory.getLogger(MetadataManager.class).error("*** REENABLING METADATA ***");
+      LoggerFactory.getLogger(SchemaChangesIT.class).error("*** REENABLING METADATA ***");
 
       session1.setSchemaMetadataEnabled(true);
       session2.setSchemaMetadataEnabled(true);
